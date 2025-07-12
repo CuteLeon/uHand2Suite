@@ -6,7 +6,7 @@ public static class HandContracts
     public const byte PackageFlagLength = 2;
     public const byte PackageFixDataLength = 2;
     public const byte ServoUnitDataLength = 3;
-    public const byte BufferSize = 30;
+    public const byte BufferSize = 100;
     public const int BaudRate = 9600;
     public const int IOTimeout = 200;
 
