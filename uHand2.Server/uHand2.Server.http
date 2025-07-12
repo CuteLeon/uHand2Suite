@@ -1,5 +1,45 @@
 @uHand2.Server_HostAddress = http://localhost:10010
 
-# Forward
-POST {{uHand2.Server_HostAddress}}/forward/
+### Forward HandPacket.FuckPacket
+POST {{uHand2.Server_HostAddress}}/forward
 Accept: application/json
+Content-Type: application/json
+
+{
+  "Command": 3,
+  "Time": 100,
+  "Servos": [
+    { "ServoId": 1, "Angle": 2000 },
+    { "ServoId": 2, "Angle": 900 },
+    { "ServoId": 3, "Angle": 2000 },
+    { "ServoId": 4, "Angle": 900 },
+    { "ServoId": 5, "Angle": 900 },
+    { "ServoId": 6, "Angle": 1500 }
+  ],
+  "Servo": null,
+  "ActionId": 0,
+  "FramesCount": 0,
+  "FrameIndex": 0
+}
+
+### Forward HandPacket.OpenPacket
+POST {{uHand2.Server_HostAddress}}/forward
+Accept: application/json
+Content-Type: application/json
+
+{
+  "Command": 3,
+  "Time": 100,
+  "Servos": [
+    { "ServoId": 1, "Angle": 1500 },
+    { "ServoId": 2, "Angle": 1500 },
+    { "ServoId": 3, "Angle": 1500 },
+    { "ServoId": 4, "Angle": 1500 },
+    { "ServoId": 5, "Angle": 1500 },
+    { "ServoId": 6, "Angle": 1500 }
+  ],
+  "Servo": null,
+  "ActionId": 0,
+  "FramesCount": 0,
+  "FrameIndex": 0
+}
