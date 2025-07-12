@@ -43,7 +43,7 @@ public class SerialPortCommunicator : IDisposable
         var readLength = serialPort.Read(readBuffer, 0, serialPort.ReadBufferSize);
         if (readLength > 0)
         {
-            Console.WriteLine(string.Join(",", readBuffer));
+            Console.WriteLine($"<<< Read: [{readLength}] {string.Join(",", readBuffer.Take(readLength))}");
         }
     }
 
@@ -89,6 +89,7 @@ public class SerialPortCommunicator : IDisposable
 
         Console.WriteLine($"Send HandPacket: {packet}");
         var bytes = HandPacketConvertor.ToBytes(packet);
+        Console.WriteLine($">>> Write: [{bytes.Length}] {string.Join(",", bytes)}");
         this.CommunicatePort.Write(bytes, 0, bytes.Length);
     }
 

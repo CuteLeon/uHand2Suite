@@ -12,5 +12,6 @@ public record struct Servo
 
     public ushort Angle;
 
-    public override readonly string ToString() => $"[{this.ServoId}] {this.Angle}";
+    public override readonly string ToString() =>
+        $"[{this.ServoId}]@{this.Angle:N0}";
 }

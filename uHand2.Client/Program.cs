@@ -22,7 +22,9 @@ internal class Program
             Console.WriteLine($"Didn't find valid Serial Port, retry ...");
             Thread.Sleep(1000);
         }
-        communicator.SendHandPacket(resetPacket);
+        // communicator.SendHandPacket(resetPacket);
+
+        communicator.SendHandPacket(fuckPacket);
 
         Console.ReadLine();
         communicator.Dispose();
