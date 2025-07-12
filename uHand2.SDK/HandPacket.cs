@@ -7,7 +7,7 @@ public record class HandPacket
         Command = HandCommands.MultipleServoMove,
         ServoCount = HandContracts.ServosTotal,
         Time = 1000,
-        Servos = [.. Enum.GetValues<HandServos>().Select(x => new Servo(x, HandContracts.AngleDefault))],
+        Servos = [.. Enum.GetValues<HandServos>().Select(x => new Servo(x, HandContracts.FingerAngleDefault))],
     };
 
     // BinaryPrimitives.WriteInt32BigEndian MemoryStream BinaryWriter stackalloc  Span<>
