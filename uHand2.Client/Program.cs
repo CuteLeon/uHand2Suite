@@ -1,5 +1,6 @@
 ﻿using System.Net.WebSockets;
 using System.Text;
+using System.Text.Json;
 using uHand2.Contract;
 using uHand2.SDK;
 
@@ -35,9 +36,10 @@ internal class Program
                 Console.WriteLine($"Failed to connect WebSocket: {ex}");
             }
         }
-        _ = Task.Run(() => ReceiveWebSocketLoopAsync(webSocket, webSocketCancellation.Token));
+        _ = Task.Run(() => ReceiveWebSocketLoopAsync(webSocket, communicator, webSocketCancellation.Token));
 
         communicator.SendHandPacket(HandPacket.ResetPacket);
+        /*
         Thread.Sleep(100);
         communicator.SendHandPacket(HandPacket.FistPacket);
         Thread.Sleep(1000);
@@ -49,6 +51,7 @@ internal class Program
         Thread.Sleep(1000);
         Thread.Sleep(1000);
         communicator.SendHandPacket(HandPacket.ResetPacket);
+         */
 
         Console.ReadLine();
         webSocketCancellation.Cancel();
@@ -56,12 +59,12 @@ internal class Program
         webSocket.Dispose();
     }
 
-    private static async Task ReceiveWebSocketLoopAsync(WebSocket webSocket, CancellationToken cancellationToken)
+    private static async Task ReceiveWebSocketLoopAsync(WebSocket webSocket, SerialPortCommunicator communicator, CancellationToken cancellationToken)
     {
         var buffer = new byte[4096];
-        try
+        while (webSocket.State == WebSocketState.Open && !cancellationToken.IsCancellationRequested)
         {
-            while (webSocket.State == WebSocketState.Open && !cancellationToken.IsCancellationRequested)
+            try
             {
                 var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken);
                 if (result.MessageType == WebSocketMessageType.Close)
@@ -74,16 +77,18 @@ internal class Program
                 {
                     var msg = Encoding.UTF8.GetString(buffer, 0, result.Count);
                     Console.WriteLine($"[WebSocket] Received: {msg}");
+                    var handPacket = JsonSerializer.Deserialize<HandPacket>(msg);
+                    communicator.SendHandPacket(handPacket);
                 }
                 else if (result.MessageType == WebSocketMessageType.Binary)
                 {
                     Console.WriteLine($"[WebSocket] Received binary data: {result.Count} bytes");
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"WebSocket receive error: {ex.Message}");
+            catch (Exception ex)
+            {
+                Console.WriteLine($"WebSocket receive error: {ex.Message}");
+            }
         }
     }
 }
