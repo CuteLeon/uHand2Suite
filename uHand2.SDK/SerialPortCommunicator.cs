@@ -87,6 +87,7 @@ public class SerialPortCommunicator : IDisposable
         var serialPort = this.CommunicatePort;
         if (!serialPort.IsOpen) return;
 
+        Console.WriteLine($"Send HandPacket: {packet}");
         var bytes = HandPacketConvertor.ToBytes(packet);
         this.CommunicatePort.Write(bytes, 0, bytes.Length);
     }
