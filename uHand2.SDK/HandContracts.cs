@@ -2,6 +2,10 @@
 
 public static class HandContracts
 {
+    public const byte PackageFlag = 0x55;
+    public const byte PackageFlagLength = 2;
+    public const byte PackageFixDataLength = 2;
+    public const byte ServoUnitDataLength = 3;
     public const int ServosTotal = 6;
     public const int FingerAngleMin = 900; // 大拇指伸展，其余手指卷曲
     public const int FingerAngleDefault = 1500;
