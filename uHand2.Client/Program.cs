@@ -12,5 +12,10 @@ internal class Program
         var openPacket = new HandPacket() { Command = HandCommands.MultipleServoMove, Time = HandContracts.DefaultTime, ServoCount = HandContracts.ServosTotal, Servos = [.. Enum.GetValues<HandServos>().Select(x => new Servo(x, HandContracts.FingerAngleMax))], };
         var closePacket = new HandPacket() { Command = HandCommands.MultipleServoMove, Time = HandContracts.DefaultTime, ServoCount = HandContracts.ServosTotal, Servos = [.. Enum.GetValues<HandServos>().Select(x => new Servo(x, HandContracts.FingerAngleMin))], };
         var stopPacket = new HandPacket() { Command = HandCommands.ServoStop, };
+
+        var communicator = new SerialPortCommunicator();
+        communicator.DetectCommunicatePort();
+
+        Console.ReadLine();
     }
 }
