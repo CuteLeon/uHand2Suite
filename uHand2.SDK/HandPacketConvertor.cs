@@ -59,8 +59,17 @@ public static class HandPacketConvertor
                     }
                     return bytes;
                 }
+            case HandCommands.FullActionStop:
+                {
+                    var dataLength = HandContracts.PackageFixDataLength;
+                    var bytes = new byte[HandContracts.PackageFlagLength + dataLength];
+                    Array.Fill(bytes, HandContracts.PackageFlag, 0, HandContracts.PackageFlagLength);
+                    bytes[2] = (byte)dataLength;
+                    bytes[3] = (byte)packet.Command;
+                    return bytes;
+                }
             default:
-                return default!;
+                throw new InvalidDataException($"Unknown HandPacket: {packet}");
         }
     }
 }

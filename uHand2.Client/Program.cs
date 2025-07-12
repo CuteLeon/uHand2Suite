@@ -1,4 +1,5 @@
-﻿using uHand2.SDK;
+﻿using System.Text.Json;
+using uHand2.SDK;
 
 namespace uHand2.Client;
 
@@ -7,11 +8,6 @@ internal class Program
     static void Main(string[] args)
     {
         Console.WriteLine("Hello, World!");
-        var resetPacket = HandPacket.ResetPacket;
-        var fuckPacket = new HandPacket() { Command = HandCommands.MultipleServoMove, Time = HandContracts.DefaultTime, Servos = [new Servo(HandServos.MiddleFinger, HandContracts.FingerAngleMax)] };
-        var openPacket = new HandPacket() { Command = HandCommands.MultipleServoMove, Time = HandContracts.DefaultTime, Servos = [.. Enum.GetValues<HandServos>().Select(x => new Servo(x, HandContracts.FingerAngleMax))], };
-        var closePacket = new HandPacket() { Command = HandCommands.MultipleServoMove, Time = HandContracts.DefaultTime, Servos = [.. Enum.GetValues<HandServos>().Select(x => new Servo(x, HandContracts.FingerAngleMin))], };
-        var stopPacket = new HandPacket() { Command = HandCommands.ServoStop, };
 
         using var communicator = new SerialPortCommunicator();
         var detectPosition = Console.GetCursorPosition();
@@ -23,13 +19,18 @@ internal class Program
             Thread.Sleep(1000);
         }
 
-        communicator.SendHandPacket(closePacket);
-        Thread.Sleep(500);
-        communicator.SendHandPacket(fuckPacket);
-        Thread.Sleep(500);
-        communicator.SendHandPacket(resetPacket);
-        Thread.Sleep(500);
-        communicator.SendHandPacket(openPacket);
+        communicator.SendHandPacket(HandPacket.ResetPacket);
+        Thread.Sleep(100);
+        communicator.SendHandPacket(HandPacket.FistPacket);
+        Thread.Sleep(1000);
+        Thread.Sleep(1000);
+        communicator.SendHandPacket(HandPacket.FuckPacket);
+        Thread.Sleep(100);
+        Thread.Sleep(1000);
+        communicator.SendHandPacket(HandPacket.OpenPacket);
+        Thread.Sleep(1000);
+        Thread.Sleep(1000);
+        communicator.SendHandPacket(HandPacket.ResetPacket);
 
         Console.ReadLine();
         communicator.Dispose();

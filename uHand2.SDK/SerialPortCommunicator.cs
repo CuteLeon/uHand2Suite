@@ -98,6 +98,7 @@ public class SerialPortCommunicator : IDisposable
 
         Console.WriteLine($"Send HandPacket: {packet}");
         var bytes = HandPacketConvertor.ToBytes(packet);
+        if (bytes is null) return;
         Console.WriteLine($">>> Write: [{bytes.Length}] {string.Join(",", bytes)}");
         this.CommunicatePort.Write(bytes, 0, bytes.Length);
     }
