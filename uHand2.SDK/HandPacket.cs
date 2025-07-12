@@ -10,7 +10,7 @@ public record class HandPacket
     };
 
     public HandPacket(
-        HandCommands command = HandCommands.SingleServoMove,
+        HandCommands command = HandCommands.MultipleServoMove,
         ushort time = HandContracts.DefaultTime,
         List<Servo>? servos = default,
         Servo? servo = default,

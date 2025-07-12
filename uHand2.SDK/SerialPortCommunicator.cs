@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Buffers;
+using System.Diagnostics;
 using System.IO.Ports;
 using System.Security.Cryptography;
 
@@ -39,12 +40,13 @@ public class SerialPortCommunicator : IDisposable
         Console.WriteLine($"SerialPort DataReceived: {e.EventType}");
         var serialPort = this.CommunicatePort;
         if (!serialPort.IsOpen) return;
-        var readBuffer = new byte[serialPort.ReadBufferSize];
+        var readBuffer = ArrayPool<byte>.Shared.Rent(serialPort.ReadBufferSize);
         var readLength = serialPort.Read(readBuffer, 0, serialPort.ReadBufferSize);
         if (readLength > 0)
         {
             Console.WriteLine($"<<< Read: [{readLength}] {string.Join(",", readBuffer.Take(readLength))}");
         }
+        ArrayPool<byte>.Shared.Return(readBuffer);
     }
 
     public bool DetectCommunicatePort()
@@ -53,33 +55,40 @@ public class SerialPortCommunicator : IDisposable
         var portNames = SerialPort.GetPortNames().OrderDescending();
         var detectPacket = new HandPacket(HandCommands.ActionDownload, actionId: byte.MaxValue, framesCount: 0, frameIndex: 0);
         var detectBytes = HandPacketConvertor.ToBytes(detectPacket);
+        var readBuffer = ArrayPool<byte>.Shared.Rent(serialPort.ReadBufferSize);
 
-        foreach (var portName in portNames)
+        try
         {
-            Console.WriteLine($"Detecting port: {portName} ...");
-            try
+            foreach (var portName in portNames)
             {
-                serialPort.PortName = portName;
-                serialPort.Open();
-                serialPort.DiscardInBuffer();
-                serialPort.DiscardOutBuffer();
-                serialPort.Write(detectBytes, 0, detectBytes.Length);
-                var readBuffer = new byte[serialPort.ReadBufferSize];
-                var readLength = serialPort.Read(readBuffer, 0, serialPort.ReadBufferSize);
-                if (readLength > 0 && readBuffer[0] == HandContracts.PackageFlag)
+                Console.WriteLine($"Detecting port: {portName} ...");
+                try
                 {
-                    Console.WriteLine($"Valid port: {portName}");
-                    return true;
+                    serialPort.PortName = portName;
+                    serialPort.Open();
+                    serialPort.DiscardInBuffer();
+                    serialPort.DiscardOutBuffer();
+                    serialPort.Write(detectBytes, 0, detectBytes.Length);
+                    var readLength = serialPort.Read(readBuffer, 0, serialPort.ReadBufferSize);
+                    if (readLength > 0 && readBuffer[0] == HandContracts.PackageFlag)
+                    {
+                        Console.WriteLine($"Valid port: {portName}");
+                        return true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to detect port name: {portName}\n{ex}");
+                    if (serialPort.IsOpen)
+                        serialPort.Close();
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to detect port name: {portName}\n{ex}");
-                if (serialPort.IsOpen)
-                    serialPort.Close();
-            }
+            return false;
         }
-        return false;
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(readBuffer);
+        }
     }
 
     public void SendHandPacket(HandPacket packet)

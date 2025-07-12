@@ -6,27 +6,6 @@ public static class HandPacketConvertor
     {
         switch (packet.Command)
         {
-            case HandCommands.SingleServoMove:
-                {
-                    const byte CommandPrefixLength = 3;
-                    var dataLength = HandContracts.PackageFixDataLength + CommandPrefixLength + HandContracts.ServoUnitDataLength * (packet.Servo is null ? 0 : 1);
-                    var bytes = new byte[HandContracts.PackageFlagLength + dataLength];
-                    Array.Fill(bytes, HandContracts.PackageFlag, 0, HandContracts.PackageFlagLength);
-                    bytes[2] = (byte)dataLength;
-                    bytes[3] = (byte)packet.Command;
-                    bytes[4] = (byte)(packet.Servos?.Count ?? 0);
-                    bytes[5] = (byte)(packet.Time & 0x00FF);
-                    bytes[6] = (byte)(packet.Time >> 8);
-                    if (packet.Servo is not null)
-                    {
-                        var prefixLength = HandContracts.PackageFlagLength + HandContracts.PackageFixDataLength + CommandPrefixLength;
-                        var servo = packet.Servo.Value;
-                        bytes[prefixLength] = (byte)servo.ServoId;
-                        bytes[prefixLength + 1] = (byte)(servo.Angle & 0x00ff);
-                        bytes[prefixLength + 2] = (byte)(servo.Angle >> 8);
-                    }
-                    return bytes;
-                }
             case HandCommands.MultipleServoMove:
                 {
                     const byte CommandPrefixLength = 3;

@@ -2,7 +2,6 @@
 
 public enum HandCommands : byte
 {
-    SingleServoMove = 2,
     MultipleServoMove = 3,
     ServoStop = 4,
     FullActionRun = 6,

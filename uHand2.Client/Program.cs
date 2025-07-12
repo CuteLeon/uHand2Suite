@@ -8,7 +8,7 @@ internal class Program
     {
         Console.WriteLine("Hello, World!");
         var resetPacket = HandPacket.ResetPacket;
-        var fuckPacket = new HandPacket() { Command = HandCommands.SingleServoMove, Time = HandContracts.DefaultTime, Servo = new Servo(HandServos.MiddleFinger, HandContracts.FingerAngleMax) };
+        var fuckPacket = new HandPacket() { Command = HandCommands.MultipleServoMove, Time = HandContracts.DefaultTime, Servos = [new Servo(HandServos.MiddleFinger, HandContracts.FingerAngleMax)] };
         var openPacket = new HandPacket() { Command = HandCommands.MultipleServoMove, Time = HandContracts.DefaultTime, Servos = [.. Enum.GetValues<HandServos>().Select(x => new Servo(x, HandContracts.FingerAngleMax))], };
         var closePacket = new HandPacket() { Command = HandCommands.MultipleServoMove, Time = HandContracts.DefaultTime, Servos = [.. Enum.GetValues<HandServos>().Select(x => new Servo(x, HandContracts.FingerAngleMin))], };
         var stopPacket = new HandPacket() { Command = HandCommands.ServoStop, };
@@ -22,9 +22,14 @@ internal class Program
             Console.WriteLine($"Didn't find valid Serial Port, retry ...");
             Thread.Sleep(1000);
         }
-        // communicator.SendHandPacket(resetPacket);
 
+        communicator.SendHandPacket(closePacket);
+        Thread.Sleep(500);
         communicator.SendHandPacket(fuckPacket);
+        Thread.Sleep(500);
+        communicator.SendHandPacket(resetPacket);
+        Thread.Sleep(500);
+        communicator.SendHandPacket(openPacket);
 
         Console.ReadLine();
         communicator.Dispose();
