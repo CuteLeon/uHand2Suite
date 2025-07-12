@@ -1,11 +1,5 @@
-@uHand2.Server_HostAddress = http://localhost:5185
+@uHand2.Server_HostAddress = http://localhost:10010
 
-GET {{uHand2.Server_HostAddress}}/todos/
+# Forward
+POST {{uHand2.Server_HostAddress}}/forward/
 Accept: application/json
-
-###
-
-GET {{uHand2.Server_HostAddress}}/todos/1
-Accept: application/json
-
-###
