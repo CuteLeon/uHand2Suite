@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Net.WebSockets;
+using System.Text;
 using uHand2.Contract;
 using uHand2.SDK;
 
@@ -6,7 +7,7 @@ namespace uHand2.Client;
 
 internal class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
         Console.WriteLine("Hello, World!");
 
@@ -20,8 +21,21 @@ internal class Program
             Thread.Sleep(1000);
         }
 
-        var json = JsonSerializer.Serialize(HandPacket.FuckPacket);
-        var packet = JsonSerializer.Deserialize<HandPacket>(json);
+        var webSocket = new ClientWebSocket();
+        var webSocketCancellation = new CancellationTokenSource();
+        while (webSocket.State != WebSocketState.Open)
+        {
+            try
+            {
+                await Task.Delay(1000);
+                await webSocket.ConnectAsync(new Uri("ws://localhost:10010/ws"), webSocketCancellation.Token);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to connect WebSocket: {ex}");
+            }
+        }
+        _ = Task.Run(() => ReceiveWebSocketLoopAsync(webSocket, webSocketCancellation.Token));
 
         communicator.SendHandPacket(HandPacket.ResetPacket);
         Thread.Sleep(100);
@@ -37,6 +51,39 @@ internal class Program
         communicator.SendHandPacket(HandPacket.ResetPacket);
 
         Console.ReadLine();
+        webSocketCancellation.Cancel();
         communicator.Dispose();
+        webSocket.Dispose();
+    }
+
+    private static async Task ReceiveWebSocketLoopAsync(WebSocket webSocket, CancellationToken cancellationToken)
+    {
+        var buffer = new byte[4096];
+        try
+        {
+            while (webSocket.State == WebSocketState.Open && !cancellationToken.IsCancellationRequested)
+            {
+                var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken);
+                if (result.MessageType == WebSocketMessageType.Close)
+                {
+                    Console.WriteLine("WebSocket closed by server.");
+                    await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed by client", cancellationToken);
+                    break;
+                }
+                else if (result.MessageType == WebSocketMessageType.Text)
+                {
+                    var msg = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                    Console.WriteLine($"[WebSocket] Received: {msg}");
+                }
+                else if (result.MessageType == WebSocketMessageType.Binary)
+                {
+                    Console.WriteLine($"[WebSocket] Received binary data: {result.Count} bytes");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"WebSocket receive error: {ex.Message}");
+        }
     }
 }
