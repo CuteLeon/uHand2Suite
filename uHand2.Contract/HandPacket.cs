@@ -1,4 +1,6 @@
-﻿namespace uHand2.SDK;
+﻿using System.Text.Json.Serialization;
+
+namespace uHand2.Contract;
 
 public record class HandPacket
 {

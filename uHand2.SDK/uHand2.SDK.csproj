@@ -10,4 +10,8 @@
 		<PackageReference Include="System.IO.Ports" Version="9.0.7" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\uHand2.Contract\uHand2.Contract.csproj" />
+	</ItemGroup>
+
 </Project>

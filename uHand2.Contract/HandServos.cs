@@ -1,4 +1,4 @@
-﻿namespace uHand2.SDK;
+﻿namespace uHand2.Contract;
 
 public enum HandServos : byte
 {

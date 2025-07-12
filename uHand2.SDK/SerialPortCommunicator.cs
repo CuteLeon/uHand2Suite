@@ -1,7 +1,6 @@
 ﻿using System.Buffers;
-using System.Diagnostics;
 using System.IO.Ports;
-using System.Security.Cryptography;
+using uHand2.Contract;
 
 namespace uHand2.SDK;
 

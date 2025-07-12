@@ -1,4 +1,6 @@
-﻿namespace uHand2.SDK;
+﻿using uHand2.Contract;
+
+namespace uHand2.SDK;
 
 public static class HandPacketConvertor
 {
