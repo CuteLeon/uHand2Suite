@@ -8,9 +8,9 @@ public record struct Servo
         this.Angle = angle;
     }
 
-    public HandServos ServoId;
+    public HandServos ServoId { get; set; }
 
-    public ushort Angle;
+    public ushort Angle { get; set; }
 
     public override readonly string ToString() =>
         $"[{this.ServoId}]@{this.Angle:N0}";

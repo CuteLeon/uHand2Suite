@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using uHand2.Contract;
 using uHand2.SDK;
 
 namespace uHand2.Client;
@@ -18,6 +19,9 @@ internal class Program
             Console.WriteLine($"Didn't find valid Serial Port, retry ...");
             Thread.Sleep(1000);
         }
+
+        var json = JsonSerializer.Serialize(HandPacket.FuckPacket);
+        var packet = JsonSerializer.Deserialize<HandPacket>(json);
 
         communicator.SendHandPacket(HandPacket.ResetPacket);
         Thread.Sleep(100);
