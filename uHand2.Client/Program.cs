@@ -13,9 +13,18 @@ internal class Program
         var closePacket = new HandPacket() { Command = HandCommands.MultipleServoMove, Time = HandContracts.DefaultTime, Servos = [.. Enum.GetValues<HandServos>().Select(x => new Servo(x, HandContracts.FingerAngleMin))], };
         var stopPacket = new HandPacket() { Command = HandCommands.ServoStop, };
 
-        var communicator = new SerialPortCommunicator();
-        communicator.DetectCommunicatePort();
+        using var communicator = new SerialPortCommunicator();
+        var detectPosition = Console.GetCursorPosition();
+        Console.WriteLine($"Detecting valid Serial Port...");
+        while (!communicator.DetectCommunicatePort())
+        {
+            Console.SetCursorPosition(detectPosition.Left, detectPosition.Top);
+            Console.WriteLine($"Didn't find valid Serial Port, retry ...");
+            Thread.Sleep(1000);
+        }
+        communicator.SendHandPacket(resetPacket);
 
         Console.ReadLine();
+        communicator.Dispose();
     }
 }

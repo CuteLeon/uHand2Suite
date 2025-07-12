@@ -4,15 +4,15 @@ using System.Security.Cryptography;
 
 namespace uHand2.SDK;
 
-public class SerialPortCommunicator
+public class SerialPortCommunicator : IDisposable
 {
     protected SerialPort CommunicatePort { get; init; } = new SerialPort()
     {
-        ReadTimeout = 200,
-        WriteTimeout = 200,
-        ReadBufferSize = 1024,
-        WriteBufferSize = 1024,
-        BaudRate = 9600,
+        ReadTimeout = HandContracts.IOTimeout,
+        WriteTimeout = HandContracts.IOTimeout,
+        ReadBufferSize = HandContracts.BufferSize,
+        WriteBufferSize = HandContracts.BufferSize,
+        BaudRate = HandContracts.BaudRate,
     };
 
     public SerialPortCommunicator()
@@ -37,12 +37,20 @@ public class SerialPortCommunicator
     private void CommunicatePort_DataReceived(object sender, SerialDataReceivedEventArgs e)
     {
         Console.WriteLine($"SerialPort DataReceived: {e.EventType}");
+        var serialPort = this.CommunicatePort;
+        if (!serialPort.IsOpen) return;
+        var readBuffer = new byte[serialPort.ReadBufferSize];
+        var readLength = serialPort.Read(readBuffer, 0, serialPort.ReadBufferSize);
+        if (readLength > 0)
+        {
+            Console.WriteLine(string.Join(",", readBuffer));
+        }
     }
 
     public bool DetectCommunicatePort()
     {
         var serialPort = this.CommunicatePort;
-        var portNames = SerialPort.GetPortNames();
+        var portNames = SerialPort.GetPortNames().OrderDescending();
         var detectPacket = new HandPacket(HandCommands.ActionDownload, actionId: byte.MaxValue, framesCount: 0, frameIndex: 0);
         var detectBytes = HandPacketConvertor.ToBytes(detectPacket);
 
@@ -67,13 +75,24 @@ public class SerialPortCommunicator
             catch (Exception ex)
             {
                 Console.WriteLine($"Failed to detect port name: {portName}\n{ex}");
-            }
-            finally
-            {
                 if (serialPort.IsOpen)
                     serialPort.Close();
             }
         }
         return false;
+    }
+
+    public void SendHandPacket(HandPacket packet)
+    {
+        var serialPort = this.CommunicatePort;
+        if (!serialPort.IsOpen) return;
+
+        var bytes = HandPacketConvertor.ToBytes(packet);
+        this.CommunicatePort.Write(bytes, 0, bytes.Length);
+    }
+
+    public void Dispose()
+    {
+        this.CommunicatePort.Dispose();
     }
 }
