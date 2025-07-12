@@ -1,4 +1,4 @@
-@uHand2.Server_HostAddress = http://localhost:10010
+@uHand2.Server_HostAddress = http://localhost:21010
 
 ### Forward HandPacket.FuckPacket
 POST {{uHand2.Server_HostAddress}}/forward
