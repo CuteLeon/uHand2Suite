@@ -11,6 +11,8 @@ internal class Program
     static async Task Main(string[] args)
     {
         Console.WriteLine("Hello, World!");
+        var webSocketHost = args.ElementAtOrDefault(0) ?? "ws://localhost:10010/ws";
+        Console.WriteLine($"WebSocketHost: {webSocketHost}");
 
         using var communicator = new SerialPortCommunicator();
         var detectPosition = Console.GetCursorPosition();
@@ -29,7 +31,7 @@ internal class Program
             try
             {
                 await Task.Delay(1000);
-                await webSocket.ConnectAsync(new Uri("ws://localhost:10010/ws"), webSocketCancellation.Token);
+                await webSocket.ConnectAsync(new Uri(webSocketHost), webSocketCancellation.Token);
             }
             catch (Exception ex)
             {
