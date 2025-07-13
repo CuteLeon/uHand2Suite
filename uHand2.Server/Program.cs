@@ -84,6 +84,37 @@ public class Program
                 return Results.BadRequest(ex.Message);
             }
         });
+        app.MapGet("/forward", async (HttpContext context) =>
+        {
+            try
+            {
+                var connection = context.Connection;
+                var request = context.Request;
+                Console.WriteLine($"""
+                    {DateTime.Now:HH:mm:ss.fff} /forward: Request: 
+                        Connection: {connection.Id} [{connection.RemoteIpAddress}:{connection.RemotePort}]
+                        EndPoint: {context.GetEndpoint()?.DisplayName}
+                        Request: {request.Scheme} {request.Method} {request.PathBase} {request.Path} {request.QueryString} [{request.ContentLength}] {request.ContentType}
+                    """);
+
+                var handPacket = context.Request.Query["HandPacket"].ToString();
+                Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} /forward: Received Request Body: [{handPacket.Length}] \n-----------------------------------\n{handPacket}\n====================================");
+
+                if (forwardWebSocket is not null)
+                {
+                    var bytes = Encoding.UTF8.GetBytes(handPacket);
+                    Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} /forward: Forward request body to WebSocket: {bytes.Length:N0} bytes");
+                    await forwardWebSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, CancellationToken.None);
+                }
+
+                return Results.Ok();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} /forward: Failed to handle Request: {ex}");
+                return Results.BadRequest(ex.Message);
+            }
+        });
 
         app.UseWebSockets();
         app.Run();
