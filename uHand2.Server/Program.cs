@@ -24,25 +24,29 @@ public class Program
             if (context.WebSockets.IsWebSocketRequest)
             {
                 Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} /ws: Starts WebSocket ...");
-                using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
-                Program.forwardWebSocket = webSocket;
-                Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} /ws: Connected: [{webSocket.SubProtocol}] {webSocket.State}");
-
-                var buffer = new byte[1024 * 4];
-                while (webSocket.State == WebSocketState.Open)
+                while (true)
                 {
-                    Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} /ws: Starts receiving WebSocket loop ...");
-                    var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-                    Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} /ws: Received WebSocket Message: [{result.MessageType}] {result.Count}");
-                    if (result.MessageType == WebSocketMessageType.Close)
+                    Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} /ws: Waiting for WebSocket Request...");
+                    using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
+                    Program.forwardWebSocket = webSocket;
+                    Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} /ws: Connected: [{webSocket.SubProtocol}] {webSocket.State}");
+
+                    var buffer = new byte[1024 * 4];
+                    while (webSocket.State == WebSocketState.Open)
                     {
-                        await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed by server", CancellationToken.None);
-                        Program.forwardWebSocket = null;
-                        Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} /ws: WebSocket Disconnect: [{result.CloseStatus}] {result.CloseStatusDescription}");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} /ws: ReceiveData: [{result.MessageType}] [{result.Count}] {string.Join(",", buffer.Take(result.Count))}");
+                        Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} /ws: Starts receiving WebSocket loop ...");
+                        var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                        Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} /ws: Received WebSocket Message: [{result.MessageType}] {result.Count}");
+                        if (result.MessageType == WebSocketMessageType.Close)
+                        {
+                            await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed by server", CancellationToken.None);
+                            Program.forwardWebSocket = null;
+                            Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} /ws: WebSocket Disconnect: [{result.CloseStatus}] {result.CloseStatusDescription}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} /ws: ReceiveData: [{result.MessageType}] [{result.Count}] {string.Join(",", buffer.Take(result.Count))}");
+                        }
                     }
                 }
             }
@@ -81,7 +85,7 @@ public class Program
             catch (Exception ex)
             {
                 Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} /forward: Failed to handle Request: {ex}");
-                return Results.BadRequest(ex.Message);
+                return Results.BadRequest();
             }
         });
         app.MapGet("/forward", async (HttpContext context) =>
