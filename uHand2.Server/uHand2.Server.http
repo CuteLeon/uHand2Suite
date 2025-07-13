@@ -9,7 +9,7 @@ Content-Type: application/json
   "Command": 3,
   "Time": 100,
   "Servos": [
-    { "ServoId": 1, "Angle": 2000 },
+    { "ServoId": 1, "Angle": 900 },
     { "ServoId": 2, "Angle": 900 },
     { "ServoId": 3, "Angle": 2000 },
     { "ServoId": 4, "Angle": 900 },
