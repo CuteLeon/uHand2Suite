@@ -1,15 +1,22 @@
 ﻿using System.ComponentModel;
+using System.Net.Http.Json;
 using GeminiDotnet;
 using GeminiDotnet.Extensions.AI;
 using Microsoft.Extensions.AI;
+using uHand2.Contract;
 
 namespace uHand2.GeminiTools;
 
 internal class Program
 {
+    static HttpClient httpClient = default!;
+
     static async Task Main(string[] args)
     {
         Console.WriteLine("Hello, World!");
+        var remoteHost = args.ElementAtOrDefault(0) ?? "http://localhost:21010";
+        httpClient = new HttpClient() { BaseAddress = new Uri(remoteHost) };
+        Console.WriteLine($"机械手远程控制端点：{remoteHost}");
         var geminiClientOptions = new GeminiClientOptions
         {
             ApiKey = GeminiContracts.APIKey,
@@ -53,7 +60,7 @@ internal class Program
         返回参数为Boolean类型，true表示姿势执行成功。
         参数说明：
         1. durationMs
-            类型: int
+            类型: uint16
             用途: 指定机械手完成姿势变化所需耗费的时间，单位为毫秒。这个参数控制动作的速度，值越大动作越慢，值越小动作越快。
             用户未明确说明时，可以静默使用1000毫秒作为此参数的默认值传入此方法中。
             示例值: 1000 (表示1秒), 5000 (表示5秒)
@@ -118,9 +125,25 @@ internal class Program
             用户未明确说明时，可以静默使用null作为此参数的默认值传入此方法中。
             示例值: 1500 (表示中间位置)
         """)]
-    public static bool ControlHand(int durationMs = 1000, ushort? thumbAngle = null, ushort? indexFingerAngle = null, ushort? middleFingerAngle = null, ushort? ringFingerAngle = null, ushort? pinkyFingerAngle = null, ushort? wristRotationAngle = null)
+    public static async Task<bool> ControlHand(ushort durationMs = 1000, ushort? thumbAngle = null, ushort? indexFingerAngle = null, ushort? middleFingerAngle = null, ushort? ringFingerAngle = null, ushort? pinkyFingerAngle = null, ushort? wristRotationAngle = null)
     {
-        Console.WriteLine($"ControlHand: {durationMs:N0}ms, Thumb:{thumbAngle,-4:N0}, Index:{indexFingerAngle,-4:N0}, Middle:{middleFingerAngle,-4:N0}, Ring:{ringFingerAngle,-4:N0}, Pinky:{pinkyFingerAngle,-4:N0}, Wrist:{wristRotationAngle,-4:N0}");
-        return true;
+        Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} [AIFunctionCalling] [ControlHand]: {durationMs:N0}ms, Thumb:{thumbAngle,-4:N0}, Index:{indexFingerAngle,-4:N0}, Middle:{middleFingerAngle,-4:N0}, Ring:{ringFingerAngle,-4:N0}, Pinky:{pinkyFingerAngle,-4:N0}, Wrist:{wristRotationAngle,-4:N0}");
+        var handPacket = new HandPacket() { Command = HandCommands.MultipleServoMove, Time = durationMs, Servos = new List<Servo>(HandContracts.ServosTotal) };
+        if (thumbAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.Thumb, thumbAngle.Value));
+        if (indexFingerAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.Thumb, indexFingerAngle.Value));
+        if (middleFingerAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.Thumb, middleFingerAngle.Value));
+        if (ringFingerAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.Thumb, ringFingerAngle.Value));
+        if (pinkyFingerAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.Thumb, pinkyFingerAngle.Value));
+        if (wristRotationAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.Thumb, wristRotationAngle.Value));
+        try
+        {
+            var response = await httpClient.PostAsJsonAsync("/forward", handPacket);
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[AIFunctionCalling] [ControlHand]: Failed to send command: {ex.Message}");
+            return false;
+        }
     }
 }
