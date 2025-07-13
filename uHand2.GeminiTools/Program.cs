@@ -9,12 +9,27 @@ internal class Program
     static async Task Main(string[] args)
     {
         Console.WriteLine("Hello, World!");
-        var options = new GeminiClientOptions { ApiKey = GeminiContracts.APIKey, ModelId = GeminiModels.Gemini2Flash };
+        var options = new GeminiClientOptions
+        {
+            ApiKey = GeminiContracts.APIKey,
+            ModelId = GeminiModels.Gemini2Flash,
+            ApiVersion = GeminiApiVersions.V1Beta,
+        };
 
         IChatClient client = new GeminiChatClient(options);
-        await foreach (var update in client.GetStreamingResponseAsync("What is AI?"))
+        while (true)
         {
-            Console.Write(update);
+            Console.WriteLine("===================================================");
+            var position = Console.GetCursorPosition();
+            Console.Write("Leon: ");
+            var userInput = Console.ReadLine();
+            Console.SetCursorPosition(position.Left, position.Top);
+            Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} Leon:\n\t{userInput}");
+            Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} Gemini: ");
+            await foreach (var update in client.GetStreamingResponseAsync(userInput))
+            {
+                Console.Write(update);
+            }
         }
 
         Console.ReadLine();
