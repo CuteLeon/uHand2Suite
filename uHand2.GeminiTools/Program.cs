@@ -1,5 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
-using GeminiDotnet;
+﻿using GeminiDotnet;
 using GeminiDotnet.Extensions.AI;
 using Microsoft.Extensions.AI;
 
