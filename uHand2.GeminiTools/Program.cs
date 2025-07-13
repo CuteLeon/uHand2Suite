@@ -118,7 +118,7 @@ internal class Program
             用户未明确说明时，可以静默使用null作为此参数的默认值传入此方法中。
             示例值: 1500 (表示中间位置)
         """)]
-    public static bool ControlHand(int durationMs, ushort? thumbAngle, ushort? indexFingerAngle, ushort? middleFingerAngle, ushort? ringFingerAngle, ushort? pinkyFingerAngle, ushort? wristRotationAngle)
+    public static bool ControlHand(int durationMs = 1000, ushort? thumbAngle = null, ushort? indexFingerAngle = null, ushort? middleFingerAngle = null, ushort? ringFingerAngle = null, ushort? pinkyFingerAngle = null, ushort? wristRotationAngle = null)
     {
         Console.WriteLine($"ControlHand: {durationMs:N0}ms, Thumb:{thumbAngle,-4:N0}, Index:{indexFingerAngle,-4:N0}, Middle:{middleFingerAngle,-4:N0}, Ring:{ringFingerAngle,-4:N0}, Pinky:{pinkyFingerAngle,-4:N0}, Wrist:{wristRotationAngle,-4:N0}");
         return true;
