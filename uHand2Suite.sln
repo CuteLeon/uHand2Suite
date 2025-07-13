@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uHand2.Contract", "uHand2.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uHand2.Server", "uHand2.Server\uHand2.Server.csproj", "{A24D54D1-CDD3-4A50-AC07-0D88802A51A0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uHand2.GeminiTools", "uHand2.GeminiTools\uHand2.GeminiTools.csproj", "{E5BE14B2-7E5F-49E4-9A14-D5C700818460}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{A24D54D1-CDD3-4A50-AC07-0D88802A51A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A24D54D1-CDD3-4A50-AC07-0D88802A51A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A24D54D1-CDD3-4A50-AC07-0D88802A51A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5BE14B2-7E5F-49E4-9A14-D5C700818460}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5BE14B2-7E5F-49E4-9A14-D5C700818460}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5BE14B2-7E5F-49E4-9A14-D5C700818460}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5BE14B2-7E5F-49E4-9A14-D5C700818460}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
