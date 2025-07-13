@@ -137,12 +137,15 @@ internal class Program
         if (wristRotationAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.Thumb, wristRotationAngle.Value));
         try
         {
+            Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} [AIFunctionCalling] [ControlHand]: Sending command to remote: {handPacket}");
             var response = await httpClient.PostAsJsonAsync("/forward", handPacket);
+            var content = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} [AIFunctionCalling] [ControlHand]: Received command response: [{response.IsSuccessStatusCode}] {response.StatusCode} {response.ReasonPhrase}: {content}");
             return response.IsSuccessStatusCode;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[AIFunctionCalling] [ControlHand]: Failed to send command: {ex.Message}");
+            Console.WriteLine($"[AIFunctionCalling] [ControlHand]: Failed to process command: {ex.Message}");
             return false;
         }
     }
