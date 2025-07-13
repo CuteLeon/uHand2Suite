@@ -57,13 +57,13 @@ internal class Program
     [Description(
         """
         此工具用于控制一个外部的右手机械手硬件。该机械手包含多个伺服传动装置，能够分别控制五根手指的伸直与弯曲，以及手腕的左右旋转。
-        通过传入不同的角度参数，可以使机械手摆出各种手势，同时还能通过时间参数控制动作的快慢。
+        通过传入不同的角度参数，可以使机械手摆出各种手势，同时还可选地通过时间参数控制动作的快慢。
         返回参数为Boolean类型，true表示姿势执行成功。
         参数说明：
         1. durationMs
-            类型: uint16
-            用途: 指定机械手完成姿势变化所需耗费的时间，单位为毫秒。这个参数控制动作的速度，值越大动作越慢，值越小动作越快。
-            用户未明确说明时，可以静默使用1000毫秒作为此参数的默认值传入此方法中。
+            类型: 可以为空的uint16
+            用途: 可选的参数，指定机械手完成姿势变化所需耗费的时间，单位为毫秒。这个参数控制动作的速度，值越大动作越慢，值越小动作越快。
+            用户未明确说明时，可以静默使用500毫秒作为此参数的默认值传入此方法中，而不需要询问用户设置具体的动作时长。
             示例值: 1000 (表示1秒), 5000 (表示5秒)
         2. thumbAngle
             类型: 可以为空的uint16
@@ -125,8 +125,9 @@ internal class Program
                 500: 手腕完全向左旋转。
             用户未明确说明时，可以静默使用null作为此参数的默认值传入此方法中。
             示例值: 1500 (表示中间位置)
+        再次强调，可以自行设置或使用默认值作为用户没有提及的参数，不要询问询问用户任何参数的具体数值，不要和用户确认任何参数的数值，也不要和用户确认接下来要摆出的手势，请直接操作机械手完成任何需要的手势。
         """)]
-    public static async Task<bool> ControlHand(ushort durationMs = 1000, ushort? thumbAngle = null, ushort? indexFingerAngle = null, ushort? middleFingerAngle = null, ushort? ringFingerAngle = null, ushort? pinkyFingerAngle = null, ushort? wristRotationAngle = null)
+    public static async Task<bool> ControlHand(ushort durationMs = 500, ushort? thumbAngle = null, ushort? indexFingerAngle = null, ushort? middleFingerAngle = null, ushort? ringFingerAngle = null, ushort? pinkyFingerAngle = null, ushort? wristRotationAngle = null)
     {
         Debug.Print($"{DateTime.Now:HH:mm:ss.fff} [AIFunctionCalling] [ControlHand]: {durationMs:N0}ms, Thumb:{thumbAngle,-4:N0}, Index:{indexFingerAngle,-4:N0}, Middle:{middleFingerAngle,-4:N0}, Ring:{ringFingerAngle,-4:N0}, Pinky:{pinkyFingerAngle,-4:N0}, Wrist:{wristRotationAngle,-4:N0}");
         var handPacket = new HandPacket() { Command = HandCommands.MultipleServoMove, Time = durationMs, Servos = new List<Servo>(HandContracts.ServosTotal) };
