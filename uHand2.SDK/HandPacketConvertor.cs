@@ -8,7 +8,10 @@ public static class HandPacketConvertor
     {
         ushort GetAngle(Servo servo)
         {
-            return servo.ServoId == HandServos.Thumb ? (ushort)(HandContracts.FingerAngleMax + HandContracts.FingerAngleMin - servo.Angle) : servo.Angle;
+            var angle = servo.ServoId == HandServos.Thumb ? (ushort)(HandContracts.FingerAngleMax + HandContracts.FingerAngleMin - servo.Angle) : servo.Angle;
+            angle = servo.ServoId == HandServos.Wrist ? Math.Min(HandContracts.WristAngleMax, Math.Max(angle, HandContracts.WristAngleMin)) :
+                Math.Min(HandContracts.FingerAngleMax, Math.Max(angle, HandContracts.FingerAngleMin));
+            return angle;
         }
 
         switch (packet.Command)
