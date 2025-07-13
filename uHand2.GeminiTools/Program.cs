@@ -130,11 +130,11 @@ internal class Program
         Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} [AIFunctionCalling] [ControlHand]: {durationMs:N0}ms, Thumb:{thumbAngle,-4:N0}, Index:{indexFingerAngle,-4:N0}, Middle:{middleFingerAngle,-4:N0}, Ring:{ringFingerAngle,-4:N0}, Pinky:{pinkyFingerAngle,-4:N0}, Wrist:{wristRotationAngle,-4:N0}");
         var handPacket = new HandPacket() { Command = HandCommands.MultipleServoMove, Time = durationMs, Servos = new List<Servo>(HandContracts.ServosTotal) };
         if (thumbAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.Thumb, thumbAngle.Value));
-        if (indexFingerAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.Thumb, indexFingerAngle.Value));
-        if (middleFingerAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.Thumb, middleFingerAngle.Value));
-        if (ringFingerAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.Thumb, ringFingerAngle.Value));
-        if (pinkyFingerAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.Thumb, pinkyFingerAngle.Value));
-        if (wristRotationAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.Thumb, wristRotationAngle.Value));
+        if (indexFingerAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.IndexFinger, indexFingerAngle.Value));
+        if (middleFingerAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.MiddleFinger, middleFingerAngle.Value));
+        if (ringFingerAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.RingFinger, ringFingerAngle.Value));
+        if (pinkyFingerAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.PinkyFinger, pinkyFingerAngle.Value));
+        if (wristRotationAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.Wrist, wristRotationAngle.Value));
         try
         {
             Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} [AIFunctionCalling] [ControlHand]: Sending command to remote: {handPacket}");

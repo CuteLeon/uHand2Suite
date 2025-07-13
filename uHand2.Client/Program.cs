@@ -85,7 +85,7 @@ internal class Program
                 {
                     var msg = Encoding.UTF8.GetString(buffer, 0, result.Count);
                     Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} [WebSocket] Received Text: {msg}");
-                    var handPacket = JsonSerializer.Deserialize<HandPacket>(msg);
+                    var handPacket = JsonSerializer.Deserialize<HandPacket>(msg, JsonSerializerOptions.Web);
                     if (handPacket is not null)
                         communicator.SendHandPacket(handPacket);
                 }
