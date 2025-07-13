@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.Net.Http.Json;
 using GeminiDotnet;
 using GeminiDotnet.Extensions.AI;
@@ -127,7 +128,7 @@ internal class Program
         """)]
     public static async Task<bool> ControlHand(ushort durationMs = 1000, ushort? thumbAngle = null, ushort? indexFingerAngle = null, ushort? middleFingerAngle = null, ushort? ringFingerAngle = null, ushort? pinkyFingerAngle = null, ushort? wristRotationAngle = null)
     {
-        Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} [AIFunctionCalling] [ControlHand]: {durationMs:N0}ms, Thumb:{thumbAngle,-4:N0}, Index:{indexFingerAngle,-4:N0}, Middle:{middleFingerAngle,-4:N0}, Ring:{ringFingerAngle,-4:N0}, Pinky:{pinkyFingerAngle,-4:N0}, Wrist:{wristRotationAngle,-4:N0}");
+        Debug.Print($"{DateTime.Now:HH:mm:ss.fff} [AIFunctionCalling] [ControlHand]: {durationMs:N0}ms, Thumb:{thumbAngle,-4:N0}, Index:{indexFingerAngle,-4:N0}, Middle:{middleFingerAngle,-4:N0}, Ring:{ringFingerAngle,-4:N0}, Pinky:{pinkyFingerAngle,-4:N0}, Wrist:{wristRotationAngle,-4:N0}");
         var handPacket = new HandPacket() { Command = HandCommands.MultipleServoMove, Time = durationMs, Servos = new List<Servo>(HandContracts.ServosTotal) };
         if (thumbAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.Thumb, thumbAngle.Value));
         if (indexFingerAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.IndexFinger, indexFingerAngle.Value));
@@ -137,10 +138,10 @@ internal class Program
         if (wristRotationAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.Wrist, wristRotationAngle.Value));
         try
         {
-            Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} [AIFunctionCalling] [ControlHand]: Sending command to remote: {handPacket}");
+            Debug.Print($"{DateTime.Now:HH:mm:ss.fff} [AIFunctionCalling] [ControlHand]: Sending command to remote: {handPacket}");
             var response = await httpClient.PostAsJsonAsync("/forward", handPacket);
             var content = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} [AIFunctionCalling] [ControlHand]: Received command response: [{response.IsSuccessStatusCode}] {response.StatusCode} {response.ReasonPhrase}: {content}");
+            Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} [AIFunctionCalling] [ControlHand]: Sent command and Received response: [{response.IsSuccessStatusCode}] {response.StatusCode} {response.ReasonPhrase}: {content}");
             return response.IsSuccessStatusCode;
         }
         catch (Exception ex)
