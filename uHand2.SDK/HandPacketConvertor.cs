@@ -6,6 +6,11 @@ public static class HandPacketConvertor
 {
     public static byte[] ToBytes(HandPacket packet)
     {
+        ushort GetAngle(Servo servo)
+        {
+            return servo.ServoId == HandServos.Thumb ? (ushort)(HandContracts.FingerAngleMax + HandContracts.FingerAngleMin - servo.Angle) : servo.Angle;
+        }
+
         switch (packet.Command)
         {
             case HandCommands.MultipleServoMove:
@@ -26,9 +31,10 @@ public static class HandPacketConvertor
                         {
                             var byteIndex = prefixLength + HandContracts.ServoUnitDataLength * index;
                             var servo = packet.Servos[index];
+                            var angle = GetAngle(servo);
                             bytes[byteIndex] = (byte)servo.ServoId;
-                            bytes[byteIndex + 1] = (byte)(servo.Angle & 0x00ff);
-                            bytes[byteIndex + 2] = (byte)(servo.Angle >> 8);
+                            bytes[byteIndex + 1] = (byte)(angle & 0x00ff);
+                            bytes[byteIndex + 2] = (byte)(angle >> 8);
                         }
                     }
                     return bytes;
@@ -54,9 +60,10 @@ public static class HandPacketConvertor
                         {
                             var byteIndex = prefixLength + HandContracts.ServoUnitDataLength * index;
                             var servo = packet.Servos[index];
+                            var angle = GetAngle(servo);
                             bytes[byteIndex] = (byte)servo.ServoId;
-                            bytes[byteIndex + 1] = (byte)(servo.Angle & 0x00ff);
-                            bytes[byteIndex + 2] = (byte)(servo.Angle >> 8);
+                            bytes[byteIndex + 1] = (byte)(angle & 0x00ff);
+                            bytes[byteIndex + 2] = (byte)(angle >> 8);
                         }
                     }
                     return bytes;

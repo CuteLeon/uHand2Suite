@@ -11,9 +11,9 @@ public static class HandContracts
     public const int IOTimeout = 200;
 
     public const byte ServosTotal = 6;
-    public const ushort FingerAngleMin = 900; // 大拇指伸展，其余手指卷曲
+    public const ushort FingerAngleMin = 900; // 手指卷曲
     public const ushort FingerAngleDefault = 1500;
-    public const ushort FingerAngleMax = 2000; // 大拇指卷曲，其余手指伸展
+    public const ushort FingerAngleMax = 2000; // 手指伸展
     public const ushort WristAngleMin = 500; // 手腕转向最左边
     public const ushort WristAngleDefault = 1500;
     public const ushort WristAngleMax = 2500; // 手腕转向最右边

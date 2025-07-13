@@ -14,26 +14,20 @@ public record class HandPacket
     {
         Command = HandCommands.MultipleServoMove,
         Time = HandContracts.TimeFast,
-        Servos = [.. Enum.GetValues<HandServos>().Select(x => new Servo(x, x == HandServos.Wrist ? HandContracts.WristAngleDefault : x == HandServos.MiddleFinger ? GetAngleStraighten(x) : GetAngleCurl(x)))],
+        Servos = [.. Enum.GetValues<HandServos>().Select(x => new Servo(x, x == HandServos.Wrist ? HandContracts.WristAngleDefault : x == HandServos.MiddleFinger ? HandContracts.FingerAngleMax : HandContracts.FingerAngleMin))],
     };
     public static readonly HandPacket OpenPacket = new()
     {
         Command = HandCommands.MultipleServoMove,
         Time = HandContracts.TimeDefault,
-        Servos = [.. Enum.GetValues<HandServos>().Select(x => new Servo(x, x == HandServos.Wrist ? HandContracts.WristAngleDefault : GetAngleStraighten(x)))],
+        Servos = [.. Enum.GetValues<HandServos>().Select(x => new Servo(x, x == HandServos.Wrist ? HandContracts.WristAngleDefault : HandContracts.FingerAngleMax))],
     };
     public static readonly HandPacket FistPacket = new()
     {
         Command = HandCommands.MultipleServoMove,
         Time = HandContracts.TimeDefault,
-        Servos = [.. Enum.GetValues<HandServos>().Select(x => new Servo(x, x == HandServos.Wrist ? HandContracts.WristAngleDefault : GetAngleCurl(x)))],
+        Servos = [.. Enum.GetValues<HandServos>().Select(x => new Servo(x, x == HandServos.Wrist ? HandContracts.WristAngleDefault : HandContracts.FingerAngleMin))],
     };
-
-    public static ushort GetAngleStraighten(HandServos servo)
-        => servo == HandServos.Thumb ? HandContracts.FingerAngleMin : HandContracts.FingerAngleMax;
-
-    public static ushort GetAngleCurl(HandServos servo)
-        => servo == HandServos.Thumb ? HandContracts.FingerAngleMax : HandContracts.FingerAngleMin;
 
     public HandPacket(
         HandCommands command = HandCommands.MultipleServoMove,
