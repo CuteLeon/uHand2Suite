@@ -60,7 +60,6 @@ internal class Program
             {
                 Console.WriteLine($"[Exception] {ex.Message}");
             }
-            Console.WriteLine();
         }
 
         Console.ReadLine();
@@ -69,22 +68,17 @@ internal class Program
 
     [Description(
         """
-        控制外部右手机械手硬件，通过伺服电机驱动五根手指弯曲/伸直及手腕旋转。
-        参数：
-            durationMs (uint16): 动作执行时间(毫秒)，默认1000
-            thumbAngle (uint16?): 大拇指角度，900(完全弯曲)~2000(完全伸直)，默认null(不动)
-            indexFingerAngle (uint16?): 食指角度，900~2000，默认null
-            middleFingerAngle (uint16?): 中指角度，900~2000，默认null
-            ringFingerAngle (uint16?): 无名指角度，900~2000，默认null
-            pinkyFingerAngle (uint16?): 小拇指角度，900~2000，默认null
-            wristRotationAngle (uint16?): 手腕旋转角度，500(完全左转)~2500(完全右转)，默认null
-        返回值： Boolean - true表示执行成功
-        注意：
-            角度值越大越伸直/右转，越小越弯曲/左转
-            null值表示该部位保持当前姿势不动
-            用户未指定参数时使用默认值
+        此方法用于控制一个外部的右手机械手硬件。该机械手包含多个伺服传动装置。
+        可选地传入时间参数以控制动作的快慢，可选地传入一个或多个角度参数以分别控制五根手指的伸直与弯曲和手腕的左右旋转。
+        返回值为布尔类型，true表示执行成功，false表示执行失败。
+        时间参数：参数名称为“durationMs”，为可选uint16类型，表示动作执行时间单位为毫秒，默认值为500，表示500毫秒。
+        手指角度参数：可选uint16类型，所有手指参数范围为900至2000之间的整数，900表示手指完全弯曲，2000表示完全伸直，null表示保持当前位置，默认值为null。
+        手指角度参数名称对应关系：“thumbAngle”表示大拇指，“indexFingerAngle”表示食指，“middleFingerAngle”表示中指，“ringFingerAngle”表示无名指，“pinkyFingerAngle”表示小拇指。
+        手腕角度参数：参数名称为“wristRotationAngle”，为可选uint16类型，表示手腕旋转角度，范围为500至2500之间的整数，500表示完全左转，2500表示完全右转，1500表示中间位置，null表示保持当前位置，默认值为null。
+        使用规则：用户未指定参数时使用默认值，无需询问；直接执行手势，无需确认；可自行推断合适的角度值。
+        特别强调，不要询问和确认任何参数，直接执行手势。
         """)]
-    static bool ControlHand(ushort durationMs = 1000, ushort? thumbAngle = null, ushort? indexFingerAngle = null, ushort? middleFingerAngle = null, ushort? ringFingerAngle = null, ushort? pinkyFingerAngle = null, ushort? wristRotationAngle = null)
+    static bool ControlHand(ushort durationMs = 500, ushort? thumbAngle = null, ushort? indexFingerAngle = null, ushort? middleFingerAngle = null, ushort? ringFingerAngle = null, ushort? pinkyFingerAngle = null, ushort? wristRotationAngle = null)
     {
         Debug.Print($"{DateTime.Now:HH:mm:ss.fff} [AIFunctionCalling] [ControlHand]: {durationMs:N0}ms, Thumb:{thumbAngle,-4:N0}, Index:{indexFingerAngle,-4:N0}, Middle:{middleFingerAngle,-4:N0}, Ring:{ringFingerAngle,-4:N0}, Pinky:{pinkyFingerAngle,-4:N0}, Wrist:{wristRotationAngle,-4:N0}");
         var handPacket = new HandPacket() { Command = HandCommands.MultipleServoMove, Time = durationMs, Servos = new List<Servo>(HandContracts.ServosTotal) };
