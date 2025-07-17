@@ -73,14 +73,14 @@ internal class Program
         返回值为布尔类型，true表示执行成功，false表示执行失败。
         时间参数：参数名称为“durationMs”，为可选uint16类型，表示动作执行时间单位为毫秒，默认值为500，表示500毫秒。
         手指角度参数：可选uint16类型，所有手指参数范围为900至2000之间的整数，900表示手指完全弯曲，2000表示完全伸直，null表示保持当前位置，默认值为null。
-        手指角度参数名称对应关系：“thumbAngle”表示大拇指，“indexFingerAngle”表示食指，“middleFingerAngle”表示中指，“ringFingerAngle”表示无名指，“pinkyFingerAngle”表示小拇指。
-        手腕角度参数：参数名称为“wristRotationAngle”，为可选uint16类型，表示手腕旋转角度，范围为500至2500之间的整数，500表示完全左转，2500表示完全右转，1500表示中间位置，null表示保持当前位置，默认值为null。
+        手指角度参数名称：参数“thumbAngle”控制大拇指伸直与卷曲，参数“indexFingerAngle”控制食指伸直与卷曲，参数“middleFingerAngle”控制中指伸直与卷曲，参数“ringFingerAngle”控制无名指伸直与卷曲，参数“pinkyFingerAngle”控制小拇指伸直与卷曲。
+        手腕角度参数：参数名称为“wristRotationAngle”，为可选uint16类型，控制手腕旋转角度，范围为500至2500之间的整数，500表示完全左转，2500表示完全右转，1500表示中间位置，null表示保持当前位置，默认值为null。
         使用规则：用户未指定参数时使用默认值，无需询问；直接执行手势，无需确认；可自行推断合适的角度值。
         特别强调，不要询问和确认任何参数，直接执行手势。
         """)]
     static bool ControlHand(ushort durationMs = 500, ushort? thumbAngle = null, ushort? indexFingerAngle = null, ushort? middleFingerAngle = null, ushort? ringFingerAngle = null, ushort? pinkyFingerAngle = null, ushort? wristRotationAngle = null)
     {
-        Debug.Print($"{DateTime.Now:HH:mm:ss.fff} [AIFunctionCalling] [ControlHand]: {durationMs:N0}ms, Thumb:{thumbAngle,-4:N0}, Index:{indexFingerAngle,-4:N0}, Middle:{middleFingerAngle,-4:N0}, Ring:{ringFingerAngle,-4:N0}, Pinky:{pinkyFingerAngle,-4:N0}, Wrist:{wristRotationAngle,-4:N0}");
+        Debug.Print($"{DateTime.Now:HH:mm:ss.fff} [AIFunctionCalling]: {durationMs:N0}ms, Thumb:{thumbAngle,-4:N0}, Index:{indexFingerAngle,-4:N0}, Middle:{middleFingerAngle,-4:N0}, Ring:{ringFingerAngle,-4:N0}, Pinky:{pinkyFingerAngle,-4:N0}, Wrist:{wristRotationAngle,-4:N0}");
         var handPacket = new HandPacket() { Command = HandCommands.MultipleServoMove, Time = durationMs, Servos = new List<Servo>(HandContracts.ServosTotal) };
         if (thumbAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.Thumb, thumbAngle.Value));
         if (indexFingerAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.IndexFinger, indexFingerAngle.Value));
@@ -90,7 +90,7 @@ internal class Program
         if (wristRotationAngle.HasValue) handPacket.Servos.Add(new Servo(HandServos.Wrist, wristRotationAngle.Value));
         try
         {
-            Debug.Print($"{DateTime.Now:HH:mm:ss.fff} [AIFunctionCalling] [ControlHand]: Sending packet on communicator: {handPacket}");
+            Debug.Print($"{DateTime.Now:HH:mm:ss.fff} [AIFunctionCalling] [ControlHand]: Sending packet on communicator: \n\t{handPacket}");
             communicator.SendHandPacket(handPacket);
             return true;
         }
