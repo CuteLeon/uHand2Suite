@@ -44,9 +44,16 @@ internal class Program
             Console.SetCursorPosition(cursorLeft, cursorTop);
             Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} Leon: {userInput}");
             Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} Gemini: ");
-            await foreach (var update in client.GetStreamingResponseAsync(userInput, chatOptions))
+            try
             {
-                Console.Write(update);
+                await foreach (var update in client.GetStreamingResponseAsync(userInput, chatOptions))
+                {
+                    Console.Write(update);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Exception] {ex.Message}");
             }
             Console.WriteLine();
         }
@@ -142,7 +149,7 @@ internal class Program
             Debug.Print($"{DateTime.Now:HH:mm:ss.fff} [AIFunctionCalling] [ControlHand]: Sending command to remote: {handPacket}");
             var response = await httpClient.PostAsJsonAsync("/forward", handPacket);
             var content = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} [AIFunctionCalling] [ControlHand]: Sent command and Received response: [{response.IsSuccessStatusCode}] {response.StatusCode} {response.ReasonPhrase}: {content}");
+            Debug.Print($"{DateTime.Now:HH:mm:ss.fff} [AIFunctionCalling] [ControlHand]: Sent command and Received response: [{response.IsSuccessStatusCode}] {response.StatusCode} {response.ReasonPhrase}: {content}");
             return response.IsSuccessStatusCode;
         }
         catch (Exception ex)
