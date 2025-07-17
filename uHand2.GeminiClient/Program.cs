@@ -19,7 +19,6 @@ internal class Program
         Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} Detecting valid Serial Port...");
         while (!communicator.DetectCommunicatePort())
         {
-            Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} Didn't find valid Serial Port, retry ...");
             await Task.Delay(1000);
         }
         Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} Serial Port Connected.");

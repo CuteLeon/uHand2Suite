@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.Diagnostics;
 using System.IO.Ports;
 using uHand2.Contract;
 
@@ -26,24 +27,24 @@ public class SerialPortCommunicator : IDisposable
 
     private void SerialPort_PinChanged(object sender, SerialPinChangedEventArgs e)
     {
-        Console.WriteLine($"SerialPort PinChanged: {e.EventType}");
+        Debug.Print($"{DateTime.Now:HH:mm:ss.fff} SerialPort PinChanged: {e.EventType}");
     }
 
     private void SerialPort_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
     {
-        Console.WriteLine($"SerialPort ErrorReceived: {e.EventType}");
+        Debug.Print($"{DateTime.Now:HH:mm:ss.fff} SerialPort ErrorReceived: {e.EventType}");
     }
 
     private void CommunicatePort_DataReceived(object sender, SerialDataReceivedEventArgs e)
     {
-        Console.WriteLine($"SerialPort DataReceived: {e.EventType}");
+        Debug.Print($"{DateTime.Now:HH:mm:ss.fff} SerialPort DataReceived: {e.EventType}");
         var serialPort = this.CommunicatePort;
         if (!serialPort.IsOpen) return;
         var readBuffer = ArrayPool<byte>.Shared.Rent(serialPort.ReadBufferSize);
         var readLength = serialPort.Read(readBuffer, 0, serialPort.ReadBufferSize);
         if (readLength > 0)
         {
-            Console.WriteLine($"<<< Read: [{readLength}] {string.Join(",", readBuffer.Take(readLength))}");
+            Debug.Print($"{DateTime.Now:HH:mm:ss.fff} Read: [{readLength}] {string.Join(",", readBuffer.Take(readLength))}");
         }
         ArrayPool<byte>.Shared.Return(readBuffer);
     }
@@ -58,9 +59,10 @@ public class SerialPortCommunicator : IDisposable
 
         try
         {
+            var (cursorLeft, cursorTop) = Console.GetCursorPosition();
             foreach (var portName in portNames)
             {
-                Console.WriteLine($"Detecting port: {portName} ...");
+                Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} Detecting port: {portName} ...");
                 try
                 {
                     serialPort.PortName = portName;
@@ -71,17 +73,18 @@ public class SerialPortCommunicator : IDisposable
                     var readLength = serialPort.Read(readBuffer, 0, serialPort.ReadBufferSize);
                     if (readLength > 0 && readBuffer[0] == HandContracts.PackageFlag)
                     {
-                        Console.WriteLine($"Valid port: {portName}");
+                        Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} Detected Valid port: {portName}".PadRight(Console.BufferWidth, ' '));
                         return true;
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Failed to detect port name: {portName}\n{ex}");
+                    Console.WriteLine($"[Exception] [{portName}] {ex.Message}");
                     if (serialPort.IsOpen)
                         serialPort.Close();
                 }
             }
+            Console.SetCursorPosition(cursorLeft, cursorTop);
             return false;
         }
         finally
@@ -95,10 +98,11 @@ public class SerialPortCommunicator : IDisposable
         var serialPort = this.CommunicatePort;
         if (!serialPort.IsOpen) return;
 
-        Console.WriteLine($"Send HandPacket: {packet}");
+        Debug.Print($"{DateTime.Now:HH:mm:ss.fff} Send HandPacket: {packet}");
         var bytes = HandPacketConvertor.ToBytes(packet);
         if (bytes is null) return;
-        Console.WriteLine($">>> Write: [{bytes.Length}] {string.Join(",", bytes)}");
+
+        Debug.Print($"{DateTime.Now:HH:mm:ss.fff} Write: [{bytes.Length}] {string.Join(",", bytes)}");
         this.CommunicatePort.Write(bytes, 0, bytes.Length);
     }
 
