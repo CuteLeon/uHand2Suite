@@ -41,12 +41,21 @@ public class SerialPortCommunicator : IDisposable
         var serialPort = this.CommunicatePort;
         if (!serialPort.IsOpen) return;
         var readBuffer = ArrayPool<byte>.Shared.Rent(serialPort.ReadBufferSize);
-        var readLength = serialPort.Read(readBuffer, 0, serialPort.ReadBufferSize);
-        if (readLength > 0)
+        try
         {
-            Debug.Print($"{DateTime.Now:HH:mm:ss.fff} Read: [{readLength}] {string.Join(",", readBuffer.Take(readLength))}");
+            var readLength = serialPort.Read(readBuffer, 0, serialPort.ReadBufferSize);
+            if (readLength > 0)
+            {
+                Debug.Print($"{DateTime.Now:HH:mm:ss.fff} Read: [{readLength}] {string.Join(",", readBuffer.Take(readLength))}");
+            }
         }
-        ArrayPool<byte>.Shared.Return(readBuffer);
+        catch
+        {
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(readBuffer);
+        }
     }
 
     public bool DetectCommunicatePort()
