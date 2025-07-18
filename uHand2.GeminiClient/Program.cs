@@ -27,6 +27,7 @@ internal class Program
 
         var geminiClientOptions = new GeminiClientOptions
         {
+            RequestTimeout = TimeSpan.FromSeconds(10),
             ApiKey = APIKey,
             ModelId = GeminiModels.Gemini2Flash,
             ApiVersion = GeminiApiVersions.V1Beta,
