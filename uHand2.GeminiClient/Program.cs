@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
+using System.Net;
 using GeminiDotnet;
 using GeminiDotnet.Extensions.AI;
 using Microsoft.Extensions.AI;
@@ -27,7 +28,7 @@ internal class Program
 
         var geminiClientOptions = new GeminiClientOptions
         {
-            RequestTimeout = TimeSpan.FromSeconds(10),
+            RequestTimeout = TimeSpan.FromSeconds(5),
             ApiKey = APIKey,
             ModelId = GeminiModels.Gemini2Flash,
             ApiVersion = GeminiApiVersions.V1Beta,
@@ -36,8 +37,23 @@ internal class Program
         {
             Tools = [AIFunctionFactory.Create(ControlHand, nameof(ControlHand))]
         };
-        var geminiClient = new GeminiChatClient(geminiClientOptions);
-        var client = new ChatClientBuilder(geminiClient).UseFunctionInvocation().Build();
+        /*
+        var httpMessageHandler = new HttpClientHandler()
+        {
+            UseProxy = true,
+            UseDefaultCredentials = true,
+            Proxy = HttpClient.DefaultProxy, // new WebProxy("xx.xx.xx.xx", 8080)
+        };
+        var httpClient = new HttpClient(httpMessageHandler)
+        {
+            BaseAddress = new Uri("https://generativelanguage.googleapis.com"),
+            Timeout = TimeSpan.FromSeconds(5)
+        };
+        var geminiClient = new GeminiClient(httpClient, geminiClientOptions);
+         */
+        var geminiClient = new GeminiClient(geminiClientOptions);
+        var geminiChatClient = new GeminiChatClient(geminiClient);
+        var client = new ChatClientBuilder(geminiChatClient).UseFunctionInvocation().Build();
 
         while (true)
         {
